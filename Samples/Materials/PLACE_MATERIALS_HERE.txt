@@ -1,0 +1,1 @@
+Place sample materials, textures, and shaders in this directory.

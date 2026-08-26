@@ -1,0 +1,10 @@
+{
+  "$schema": "infernux.inxpackage.source",
+  "reference": "your-studio/example-plugin",
+  "name": "Example Plugin",
+  "version": "0.1.0",
+  "engine": ">=0.3.7,<0.4",
+  "description": "A minimal Infernux runtime and editor extension.",
+  "dependencies": [],
+  "requirements": "requirements.txt"
+}

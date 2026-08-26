@@ -1,0 +1,1 @@
+Place sample .scene assets in this directory.
