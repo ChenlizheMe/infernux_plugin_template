@@ -1,8 +1,13 @@
-name: Validate Plugin Template
+name: Validate and Release Plugin
 
 on:
   push:
+    tags:
+      - "v*"
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   validate:
@@ -11,6 +16,45 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Validate package layout and Python sources
         run: python .infernux-dev/validate.py
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install the matching Infernux package toolchain
+        run: python -m pip install "infernux>=0.4,<0.5"
+      - name: Build and verify a reproducible package
+        run: |
+          mkdir -p dist/repro
+          inx package build . dist/plugin.inxpkg
+          inx package verify dist/plugin.inxpkg
+          inx package build . dist/repro/plugin.inxpkg
+          cmp dist/plugin.inxpkg dist/repro/plugin.inxpkg
+          rm -rf dist/repro
+          sha256sum dist/plugin.inxpkg > dist/plugin.inxpkg.sha256
+      - name: Generate the Infernux release manifest
+        run: >-
+          inx package release-manifest dist/plugin.inxpkg
+          --tag "${GITHUB_REF_NAME}"
+          --output dist/infernux-plugin-release.json
+      - name: Publish GitHub Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          dist/plugin.inxpkg
+          dist/plugin.inxpkg.sha256
+          dist/infernux-plugin-release.json
+          --verify-tag
+          --generate-notes

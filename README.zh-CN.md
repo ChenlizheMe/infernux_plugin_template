@@ -11,11 +11,12 @@
 1. 将 `InxPackage.json` 中的 `your-studio/example-plugin` 改成全局唯一的小写标识。
 2. 重命名 `Runtime/your_studio/example_plugin` 和 `Editor/your_studio/example_plugin_editor`，并同步修改 import 和面板 `type_id`。
 3. 在 Infernux 项目中直接打开这个仓库，像普通项目资产一样编辑并测试组件和编辑器面板。
-4. 在 `infernux` 环境中构建分发包：
+4. 使用 Python 3.13，在 `infernux` 环境中构建并校验分发包：
 
    ```powershell
    conda activate infernux
-   python .infernux-dev/build.py
+   inx package build . dist/example-plugin.inxpkg
+   inx package verify dist/example-plugin.inxpkg
    ```
 
 5. 在另一个项目中导入 `dist/example-plugin.inxpkg`，或在插件面板中输入仓库 Git 地址安装。
@@ -43,7 +44,7 @@ infernux-plugin/
 │  ├─ Scenes/
 │  ├─ Materials/
 │  └─ Scripts/                     安装到 Assets/Plugins 的普通资产
-├─ .infernux-dev/                  本地构建和校验工具，不进入插件包
+├─ .infernux-dev/                  本地校验工具，不进入插件包
 └─ .github/workflows/              仓库校验，不进入插件包
 ```
 
@@ -56,7 +57,7 @@ infernux-plugin/
   "reference": "your-studio/example-plugin",
   "name": "Example Plugin",
   "version": "0.1.0",
-  "engine": ">=0.3.7,<0.4",
+  "engine": ">=0.4,<0.5",
   "dependencies": ["your-studio/foundation"],
   "requirements": "requirements.txt"
 }
@@ -77,3 +78,9 @@ infernux-plugin/
 - `LICENSE` 与可选的 `LICENSE.zh-CN.md`
 
 相对路径图片可以和文档放在一起，或统一放入 `InxPluginPages/media/`。
+
+## 发布 Release
+
+先更新 `InxPackage.json` 中的 `version` 和 `engine`，提交后推送与版本完全一致的 `v<version>` tag，例如 `v0.1.0`。模板自带的工作流会在 Python 3.13 上校验仓库，连续构建两次以确认产物可复现，校验包内配置，并把 `plugin.inxpkg`、SHA-256 文件与 `infernux-plugin-release.json` 一起发布到 GitHub Release。
+
+插件面板会先读取 Release manifest，再下载插件包，并校验 tag、插件版本、兼容的 Infernux 范围、产物文件名、字节数和 SHA-256。没有 Infernux Release manifest 的仓库仍可从源码安装；一旦仓库采用 Release manifest，遇到无效或不兼容的 Release 就会明确拒绝，不会静默改装仓库 HEAD。

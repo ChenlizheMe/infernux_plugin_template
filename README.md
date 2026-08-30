@@ -11,11 +11,12 @@ This repository is a starting point for an Infernux plugin that contains runtime
 1. Replace `your-studio/example-plugin` in `InxPackage.json` with a globally unique lowercase reference.
 2. Rename `Runtime/your_studio/example_plugin` and `Editor/your_studio/example_plugin_editor`, then update the imports and panel `type_id`.
 3. Open the repository inside an Infernux project, edit the files, and test the component and editor panel normally.
-4. Build the distributable package in the `infernux` environment:
+4. Use Python 3.13 and build the distributable package in the `infernux` environment:
 
    ```powershell
    conda activate infernux
-   python .infernux-dev/build.py
+   inx package build . dist/example-plugin.inxpkg
+   inx package verify dist/example-plugin.inxpkg
    ```
 
 5. Import `dist/example-plugin.inxpkg` in another project, or install the repository through its Git URL in the Plugins panel.
@@ -43,7 +44,7 @@ infernux-plugin/
 │  ├─ Scenes/
 │  ├─ Materials/
 │  └─ Scripts/                     ordinary assets installed under Assets/Plugins
-├─ .infernux-dev/                  local build and validation helpers; not packaged
+├─ .infernux-dev/                  local validation helpers; not packaged
 └─ .github/workflows/              repository validation; not packaged
 ```
 
@@ -56,7 +57,7 @@ infernux-plugin/
   "reference": "your-studio/example-plugin",
   "name": "Example Plugin",
   "version": "0.1.0",
-  "engine": ">=0.3.7,<0.4",
+  "engine": ">=0.4,<0.5",
   "dependencies": ["your-studio/foundation"],
   "requirements": "requirements.txt"
 }
@@ -77,3 +78,9 @@ English/default content uses the unsuffixed filename. Simplified Chinese uses ex
 - `LICENSE` and optional `LICENSE.zh-CN.md`
 
 Relative images belong beside the documentation or under `InxPluginPages/media/`.
+
+## Publishing releases
+
+Update `version` and `engine` in `InxPackage.json`, commit the change, and push a tag whose name is exactly `v<version>`, for example `v0.1.0`. The included workflow validates the repository on Python 3.13, builds the package twice to verify deterministic output, verifies the package metadata, and publishes `plugin.inxpkg`, its SHA-256 file, and `infernux-plugin-release.json` to a GitHub Release.
+
+The Plugins panel reads that release manifest before it downloads the package. It verifies the tag, package version, compatible Infernux range, artifact name, byte size, and SHA-256. Repositories without an Infernux release manifest can still be installed from source; once release manifests exist, an invalid or incompatible release is rejected instead of silently installing repository HEAD.
