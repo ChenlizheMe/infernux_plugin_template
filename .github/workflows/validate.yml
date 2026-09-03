@@ -31,21 +31,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-          cache: pip
-      - name: Install the matching Infernux package toolchain
-        run: python -m pip install "infernux>=0.4,<0.5"
       - name: Build and verify a reproducible package
         run: |
           mkdir -p dist/repro
-          inx package build . dist/plugin.inxpkg
-          inx package verify dist/plugin.inxpkg
-          inx package build . dist/repro/plugin.inxpkg
+          python package.py build dist/plugin.inxpkg
+          python package.py verify dist/plugin.inxpkg
+          python package.py build dist/repro/plugin.inxpkg
           cmp dist/plugin.inxpkg dist/repro/plugin.inxpkg
           rm -rf dist/repro
-          sha256sum dist/plugin.inxpkg > dist/plugin.inxpkg.sha256
       - name: Generate the Infernux release manifest
         run: >-
-          inx package release-manifest dist/plugin.inxpkg
+          python package.py release-manifest dist/plugin.inxpkg
           --tag "${GITHUB_REF_NAME}"
           --output dist/infernux-plugin-release.json
       - name: Publish GitHub Release assets
@@ -54,7 +50,6 @@ jobs:
         run: >-
           gh release create "${GITHUB_REF_NAME}"
           dist/plugin.inxpkg
-          dist/plugin.inxpkg.sha256
           dist/infernux-plugin-release.json
           --verify-tag
           --generate-notes

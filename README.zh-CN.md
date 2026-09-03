@@ -2,85 +2,48 @@
 
 [English](README.md)
 
-![插件包布局](InxPluginPages/media/package-layout.svg)
-
-这个仓库用于创建同时包含运行时代码、编辑器工具、文档、本地化页面和示例资产的 Infernux 插件。开发时可以把仓库直接放进项目，也可以点击 GitHub 的 **Use this template** 创建独立仓库。
+这个模板把“怎么开发”与“最终分发什么”彻底分开。仓库外层可以使用 CMake、Cargo、Gradle、npm 或任意工具；只有放进 `package/` 的文件才进入 `.inxpkg`。外层 README、构建配置、CI、源码树和临时产物都不会被打包。
 
 ## 快速开始
 
-1. 将 `InxPackage.json` 中的 `your-studio/example-plugin` 改成全局唯一的小写标识。
-2. 重命名 `Runtime/your_studio/example_plugin` 和 `Editor/your_studio/example_plugin_editor`，并同步修改 import 和面板 `type_id`。
-3. 在 Infernux 项目中直接打开这个仓库，像普通项目资产一样编辑并测试组件和编辑器面板。
-4. 使用 Python 3.13，在 `infernux` 环境中构建并校验分发包：
+1. 修改 `package/inx_package.json`，设置全局唯一的小写插件标识。
+2. Player 可用文件放进 `package/runtime/`，仅编辑器可用文件放进 `package/editor/`，普通资产放进 `package/` 下其它小写目录。
+3. 外层构建完成后，把最终依赖的 `.dll`、`.so`、`.pyd`、`.wasm`、Java 资源、Shader、材质、网页或任意文件放进 `package/`。
+4. 不安装 Infernux，直接打包和校验：
 
    ```powershell
-   conda activate infernux
-   inx package build . dist/example-plugin.inxpkg
-   inx package verify dist/example-plugin.inxpkg
+   python package.py build dist/example-plugin.inxpkg
+   python package.py verify dist/example-plugin.inxpkg
    ```
 
-5. 在另一个项目中导入 `dist/example-plugin.inxpkg`，或在插件面板中输入仓库 Git 地址安装。
-
-## 目录说明
+## 目录结构
 
 ```text
 infernux-plugin/
-├─ InxPackage.json                 插件标识、版本、引擎范围和依赖
-├─ requirements.txt               pip 依赖和注册表插件标识
-├─ README.md                       插件面板默认简介
-├─ README.zh-CN.md                 简体中文简介
-├─ LICENSE                         默认许可证页面
-├─ CHANGELOG.md
-├─ CHANGELOG.zh-CN.md
-├─ Runtime/
-│  └─ your_studio/example_plugin/ 玩家包可用的组件、API 和预载生命周期
-├─ Editor/
-│  └─ your_studio/example_plugin_editor/ 仅编辑器使用的面板和创作工具
-├─ InxPluginPages/
-│  ├─ Usage.md                     附加信息选项页
-│  ├─ Usage.zh-CN.md               使用固定 zh-CN 后缀的中文页
-│  └─ media/                       README 和信息页引用的图片
-├─ Samples/
-│  ├─ Scenes/
-│  ├─ Materials/
-│  └─ Scripts/                     安装到 Assets/Plugins 的普通资产
-├─ .infernux-dev/                  本地校验工具，不进入插件包
-└─ .github/workflows/              仓库校验，不进入插件包
+├─ package.py                     只依赖 Python 标准库的打包器
+├─ CMakeLists.txt / build.gradle  可选开发工具，不进入包
+├─ README.md                      仓库文档，不进入包
+├─ package/
+│  ├─ inx_package.json            插件身份与引擎兼容范围
+│  ├─ runtime/                    Editor 与 Player 均可用
+│  ├─ editor/                     只供 Editor 使用
+│  ├─ plugin_pages/               插件面板中的独立页面
+│  ├─ requirements.txt            可选、固定文件名的 Python 依赖
+│  └─ samples/、shaders/、web/    安装到 Assets/Plugins 的普通资产
+└─ .github/workflows/             仓库自动化，不进入包
 ```
 
-`Runtime/`、`Editor/`、manifest、README、许可证、requirements 和 `InxPluginPages/` 属于受控包内容，安装到 `Packages/<reference>`。其它顶层内容安装到 `Assets/Plugins/<reference>`，因此场景、材质、Prefab、纹理和脚本都可以随插件分发，同时不会污染项目根目录。
-
-## 配置示例
+manifest 不再包含 `requirements` 或 `dependencies` 字段。存在 `requirements.txt` 时，引擎按固定文件名识别。包格式不会猜测 `.pyd`、`.wasm`、材质、Shader、HTML 或未知文件的含义，它们都只是字节；目录位置决定文件所有权和是否导出到 Player。
 
 ```json
 {
+  "$schema": "infernux.inxpackage.source",
   "reference": "your-studio/example-plugin",
   "name": "Example Plugin",
   "version": "0.1.0",
   "engine": ">=0.4,<0.5",
-  "dependencies": ["your-studio/foundation"],
-  "requirements": "requirements.txt"
+  "intro": "A minimal Infernux runtime and editor extension."
 }
 ```
 
-标识本身就是命名空间，可以使用 `company/physics/jolt` 这样的多级结构。插件依赖会先通过插件注册表解析，再处理 pip 依赖。`requirements.txt` 可以包含普通 pip 语法、注册表插件标识和嵌套 `.inxpkg` 路径。
-
-## 预载与编辑器工具
-
-只有继承 `InxPreload` 的类会被提前导入。使用 `preload()` 注册进程内服务或载入编辑器贡献，并在 `unload()` 中释放无需重启即可移除的状态。玩家构建会忽略 `Editor/`；示例预载也只会在 `context.runtime` 为 false 时导入面板。
-
-## 本地化
-
-英文或默认内容使用不带后缀的文件名，简体中文只使用固定的 `.zh-CN`：
-
-- `README.md` 与 `README.zh-CN.md`
-- `Usage.md` 与 `Usage.zh-CN.md`
-- `LICENSE` 与可选的 `LICENSE.zh-CN.md`
-
-相对路径图片可以和文档放在一起，或统一放入 `InxPluginPages/media/`。
-
-## 发布 Release
-
-先更新 `InxPackage.json` 中的 `version` 和 `engine`，提交后推送与版本完全一致的 `v<version>` tag，例如 `v0.1.0`。模板自带的工作流会在 Python 3.13 上校验仓库，连续构建两次以确认产物可复现，校验包内配置，并把 `plugin.inxpkg`、SHA-256 文件与 `infernux-plugin-release.json` 一起发布到 GitHub Release。
-
-插件面板会先读取 Release manifest，再下载插件包，并校验 tag、插件版本、兼容的 Infernux 范围、产物文件名、字节数和 SHA-256。没有 Infernux Release manifest 的仓库仍可从源码安装；一旦仓库采用 Release manifest，遇到无效或不兼容的 Release 就会明确拒绝，不会静默改装仓库 HEAD。
+插件面板文档只从 `plugin_pages/` 发现；仓库根部 README 和许可证不再被当成插件文件。推送 `v<version>` tag 后，模板工作流会构建两次并比较确定性字节，然后发布 `.inxpkg` 与 `infernux-plugin-release.json`。

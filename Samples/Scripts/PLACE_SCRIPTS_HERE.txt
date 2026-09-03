@@ -1,1 +1,0 @@
-Place optional sample gameplay scripts here. Keep reusable plugin code in Runtime/.

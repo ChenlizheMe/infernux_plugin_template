@@ -4,7 +4,5 @@
   "name": "Example Plugin",
   "version": "0.1.0",
   "engine": ">=0.4,<0.5",
-  "description": "A minimal Infernux runtime and editor extension.",
-  "dependencies": [],
-  "requirements": "requirements.txt"
+  "intro": "A minimal Infernux runtime and editor extension."
 }
