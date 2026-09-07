@@ -2,7 +2,7 @@
 
 The official starter repository for creating plugins for [Infernux](https://github.com/ChenlizheMe/Infernux), an open-source C++17/Vulkan game engine with a Python authoring layer. Use this template for Python extensions, native libraries, Java tools, WebAssembly modules, shaders, materials, web content, or any other files an Infernux project needs.
 
-[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Documentation](https://github.com/ChenlizheMe/Infernux/tree/master/docs) · [Official Plugins](https://github.com/ChenlizheMe/Infernux#official-platform-plugins)
+[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Documentation](https://github.com/ChenlizheMe/Infernux/tree/master/docs) · [Official Plugins](https://github.com/ChenlizheMe/Infernux#plugins)
 
 ```mermaid
 flowchart LR
