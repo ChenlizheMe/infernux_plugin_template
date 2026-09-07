@@ -34,17 +34,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+      - name: Name the release artifact from the package reference
+        run: |
+          PACKAGE_NAME="$(python -c 'import json; print(json.load(open("package/inx_package.json"))["reference"].replace("/", ".") + ".inxpkg")')"
+          echo "PACKAGE_NAME=${PACKAGE_NAME}" >> "${GITHUB_ENV}"
       - name: Build and verify a reproducible package
         run: |
           mkdir -p dist/repro
-          python package.py build dist/plugin.inxpkg
-          python package.py verify dist/plugin.inxpkg
-          python package.py build dist/repro/plugin.inxpkg
-          cmp dist/plugin.inxpkg dist/repro/plugin.inxpkg
+          python package.py build "dist/${PACKAGE_NAME}"
+          python package.py verify "dist/${PACKAGE_NAME}"
+          python package.py build "dist/repro/${PACKAGE_NAME}"
+          cmp "dist/${PACKAGE_NAME}" "dist/repro/${PACKAGE_NAME}"
           rm -rf dist/repro
       - name: Generate the Infernux release manifest
         run: >-
-          python package.py release-manifest dist/plugin.inxpkg
+          python package.py release-manifest "dist/${PACKAGE_NAME}"
           --tag "${GITHUB_REF_NAME}"
           --output dist/infernux-plugin-release.json
       - name: Publish GitHub Release assets
@@ -52,8 +56,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" dist/plugin.inxpkg dist/infernux-plugin-release.json --clobber
+            gh release upload "${GITHUB_REF_NAME}" "dist/${PACKAGE_NAME}" dist/infernux-plugin-release.json --clobber
           else
-            gh release create "${GITHUB_REF_NAME}" dist/plugin.inxpkg dist/infernux-plugin-release.json \
+            gh release create "${GITHUB_REF_NAME}" "dist/${PACKAGE_NAME}" dist/infernux-plugin-release.json \
               --verify-tag --generate-notes
           fi
