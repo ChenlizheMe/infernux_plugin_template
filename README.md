@@ -1,49 +1,55 @@
 # Infernux Plugin Template
 
-[简体中文](README.zh-CN.md)
+The official starter repository for creating plugins for [Infernux](https://github.com/ChenlizheMe/Infernux), an open-source C++17/Vulkan game engine with a Python authoring layer. Use this template for Python extensions, native libraries, Java tools, WebAssembly modules, shaders, materials, web content, or any other files an Infernux project needs.
 
-This repository separates authoring from distribution. You may use CMake, Cargo, Gradle, npm, or any other tooling at the repository root. Only files placed under `package/` enter the `.inxpkg`; the root README, build configuration, CI, source trees, and temporary output never do.
+[简体中文](README.zh-CN.md) · [Infernux Engine](https://github.com/ChenlizheMe/Infernux) · [Plugin Documentation](https://github.com/ChenlizheMe/Infernux/tree/master/docs) · [Official Plugins](https://github.com/ChenlizheMe/Infernux#official-platform-plugins)
 
-## Quick start
+```mermaid
+flowchart LR
+    A[Your source and build tools] --> B[package/]
+    B --> C[package.py]
+    C --> D[Installable .inxpkg]
+    D --> E[Infernux Editor and Player]
+```
 
-1. Edit `package/inx_package.json` and choose a globally unique lowercase reference.
-2. Put Player-safe files under `package/runtime/`, Editor-only files under `package/editor/`, and ordinary assets under any other lowercase directory in `package/`.
-3. Let your outer build place its final `.dll`, `.so`, `.pyd`, `.wasm`, Java resources, shaders, materials, web pages, or other required files into `package/`.
-4. Build without installing Infernux:
+## Create a plugin
+
+1. Select **Use this template** on GitHub and clone your new repository.
+2. Edit `package/inx_package.json`: choose a globally unique lowercase `reference`, a human-readable name, a version, and the supported Infernux range.
+3. Put runtime files in `package/runtime/`, Editor-only code in `package/editor/`, and plugin documentation in `package/plugin_pages/`. Other assets may use directories that fit your plugin.
+4. Build and verify the installable package:
 
    ```powershell
    python package.py build dist/example-plugin.inxpkg
    python package.py verify dist/example-plugin.inxpkg
    ```
 
-## Layout
+`package.py` uses only the Python standard library, so packaging does not require an Infernux installation. Your repository may use CMake, Gradle, Cargo, npm, or another build system; copy only the files users need at runtime into `package/`.
+
+## Package layout
 
 ```text
-infernux-plugin/
-├─ package.py                     standalone standard-library packer
-├─ CMakeLists.txt / build.gradle  optional author tooling; never packaged
-├─ README.md                      repository documentation; never packaged
+your-plugin/
+├─ package.py                  standalone InxPackage builder
+├─ README.md                   GitHub project documentation
 ├─ package/
-│  ├─ inx_package.json            package identity and compatibility
-│  ├─ runtime/                    Player and Editor runtime files
-│  ├─ editor/                     Editor-only files
-│  ├─ plugin_pages/               pages shown by the Plugins panel
-│  ├─ requirements.txt            optional fixed-name Python requirements
-│  └─ samples/, shaders/, web/    ordinary assets installed under Assets/Plugins
-└─ .github/workflows/             repository automation; never packaged
+│  ├─ inx_package.json         identity, version, engine compatibility
+│  ├─ runtime/                 available to Editor and exported Players
+│  ├─ editor/                  Editor-only code and tools
+│  ├─ plugin_pages/            documentation shown in the Plugins window
+│  ├─ requirements.txt         optional Python requirements
+│  └─ shaders/, web/, samples/ optional plugin assets
+└─ .github/workflows/          validation and release automation
 ```
 
-The manifest intentionally contains no `requirements` or `dependencies` keys. `requirements.txt`, when present, is found by its fixed filename. The package format treats `.pyd`, `.wasm`, materials, shaders, HTML, and unknown files as bytes; placement determines ownership and Player export policy.
+Only `package/` enters the `.inxpkg`. Source trees, build files, repository documentation, tests, and temporary output stay outside. The packer preserves arbitrary file types; directory placement determines how Infernux installs and exports them.
 
-```json
-{
-  "$schema": "infernux.inxpackage.source",
-  "reference": "your-studio/example-plugin",
-  "name": "Example Plugin",
-  "version": "0.1.0",
-  "engine": ">=0.4,<0.5",
-  "intro": "A minimal Infernux runtime and editor extension."
-}
-```
+## Automated releases
 
-`plugin_pages/` is the only conventional source for Plugins-panel documentation. Root README and license files remain repository content. Push a `v<version>` tag to run the included workflow, which builds the package twice, checks deterministic bytes, and publishes the package plus `infernux-plugin-release.json`.
+Every pull request and push to `main` validates the manifest and verifies deterministic package output. Set the manifest version, then push the matching `v<version>` tag. GitHub Actions publishes the `.inxpkg` and `infernux-plugin-release.json` to a GitHub Release, ready for the Infernux Plugins window.
+
+For a complete production example, see the [Windows](https://github.com/ChenlizheMe/infernux_windows), [Linux](https://github.com/ChenlizheMe/infernux_linux), [Web](https://github.com/ChenlizheMe/infernux_web), [Android](https://github.com/ChenlizheMe/infernux_android), and [MCP](https://github.com/ChenlizheMe/infernux_mcp) plugins.
+
+## License
+
+[MIT](LICENSE).

@@ -1,49 +1,55 @@
 # Infernux 插件模板
 
-[English](README.md)
+这是 [Infernux](https://github.com/ChenlizheMe/Infernux) 游戏引擎的官方插件项目模板。无论你准备开发 Python 扩展、原生库、Java 工具、WebAssembly 模块，还是分发 Shader、材质、网页和其他项目资源，都可以从这个仓库开始。
 
-这个模板把“怎么开发”与“最终分发什么”彻底分开。仓库外层可以使用 CMake、Cargo、Gradle、npm 或任意工具；只有放进 `package/` 的文件才进入 `.inxpkg`。外层 README、构建配置、CI、源码树和临时产物都不会被打包。
+[English](README.md) · [Infernux 引擎](https://github.com/ChenlizheMe/Infernux) · [插件开发文档](https://github.com/ChenlizheMe/Infernux/tree/master/docs) · [官方插件](https://github.com/ChenlizheMe/Infernux#official-platform-plugins)
 
-## 快速开始
+```mermaid
+flowchart LR
+    A[源码与构建工具] --> B[package/]
+    B --> C[package.py]
+    C --> D[可安装的 .inxpkg]
+    D --> E[Infernux 编辑器与 Player]
+```
 
-1. 修改 `package/inx_package.json`，设置全局唯一的小写插件标识。
-2. Player 可用文件放进 `package/runtime/`，仅编辑器可用文件放进 `package/editor/`，普通资产放进 `package/` 下其它小写目录。
-3. 外层构建完成后，把最终依赖的 `.dll`、`.so`、`.pyd`、`.wasm`、Java 资源、Shader、材质、网页或任意文件放进 `package/`。
-4. 不安装 Infernux，直接打包和校验：
+## 创建第一个插件
+
+1. 在 GitHub 页面点击 **Use this template**，创建并克隆自己的插件仓库。
+2. 修改 `package/inx_package.json`：填写全局唯一的小写 `reference`、插件名称、版本号和支持的 Infernux 版本范围。
+3. 运行时文件放在 `package/runtime/`，只供编辑器使用的代码放在 `package/editor/`，插件窗口中的介绍文档放在 `package/plugin_pages/`。其他资产可以按插件需要组织目录。
+4. 构建并校验安装包：
 
    ```powershell
    python package.py build dist/example-plugin.inxpkg
    python package.py verify dist/example-plugin.inxpkg
    ```
 
+`package.py` 只使用 Python 标准库，打包时不需要安装 Infernux。仓库可以自由使用 CMake、Gradle、Cargo、npm 或其他构建工具；只需把用户运行插件时真正需要的文件放进 `package/`。
+
 ## 目录结构
 
 ```text
-infernux-plugin/
-├─ package.py                     只依赖 Python 标准库的打包器
-├─ CMakeLists.txt / build.gradle  可选开发工具，不进入包
-├─ README.md                      仓库文档，不进入包
+your-plugin/
+├─ package.py                  独立的 InxPackage 打包器
+├─ README.md                   GitHub 仓库说明
 ├─ package/
-│  ├─ inx_package.json            插件身份与引擎兼容范围
-│  ├─ runtime/                    Editor 与 Player 均可用
-│  ├─ editor/                     只供 Editor 使用
-│  ├─ plugin_pages/               插件面板中的独立页面
-│  ├─ requirements.txt            可选、固定文件名的 Python 依赖
-│  └─ samples/、shaders/、web/    安装到 Assets/Plugins 的普通资产
-└─ .github/workflows/             仓库自动化，不进入包
+│  ├─ inx_package.json         标识、版本与引擎兼容范围
+│  ├─ runtime/                 编辑器和导出的 Player 都可使用
+│  ├─ editor/                  仅供编辑器使用的代码与工具
+│  ├─ plugin_pages/            插件窗口中显示的介绍页面
+│  ├─ requirements.txt         可选的 Python 依赖
+│  └─ shaders/、web/、samples/ 可选的插件资产
+└─ .github/workflows/          自动校验与发布流程
 ```
 
-manifest 不再包含 `requirements` 或 `dependencies` 字段。存在 `requirements.txt` 时，引擎按固定文件名识别。包格式不会猜测 `.pyd`、`.wasm`、材质、Shader、HTML 或未知文件的含义，它们都只是字节；目录位置决定文件所有权和是否导出到 Player。
+最终只有 `package/` 会进入 `.inxpkg`。源码、构建配置、仓库 README、测试和临时产物都留在包外。打包器不会限制文件类型；Infernux 根据目录位置决定安装位置以及是否随 Player 导出。
 
-```json
-{
-  "$schema": "infernux.inxpackage.source",
-  "reference": "your-studio/example-plugin",
-  "name": "Example Plugin",
-  "version": "0.1.0",
-  "engine": ">=0.4,<0.5",
-  "intro": "A minimal Infernux runtime and editor extension."
-}
-```
+## 自动发布
 
-插件面板文档只从 `plugin_pages/` 发现；仓库根部 README 和许可证不再被当成插件文件。推送 `v<version>` tag 后，模板工作流会构建两次并比较确定性字节，然后发布 `.inxpkg` 与 `infernux-plugin-release.json`。
+每个 Pull Request 和推送到 `main` 的提交都会校验 manifest，并确认两次构建得到完全一致的包。准备发布时，先更新 manifest 中的版本，再推送对应的 `v<version>` 标签。GitHub Actions 会把 `.inxpkg` 和 `infernux-plugin-release.json` 自动上传到 GitHub Release，供 Infernux 插件窗口识别和安装。
+
+完整的生产项目可以参考 [Windows](https://github.com/ChenlizheMe/infernux_windows)、[Linux](https://github.com/ChenlizheMe/infernux_linux)、[Web](https://github.com/ChenlizheMe/infernux_web)、[Android](https://github.com/ChenlizheMe/infernux_android) 和 [MCP](https://github.com/ChenlizheMe/infernux_mcp) 官方插件。
+
+## 许可证
+
+[MIT](LICENSE)。
