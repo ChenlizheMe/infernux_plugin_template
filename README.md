@@ -26,6 +26,8 @@ flowchart LR
 
 `package.py` uses only the Python standard library, so packaging does not require an Infernux installation. Your repository may use CMake, Gradle, Cargo, npm, or another build system; copy only the files users need at runtime into `package/`.
 
+Inside an Infernux project, the selected folder is already the package root: select it in Project/File Manager, right click, and choose **Export InxPackage...**. The installed Plugins page contains the full tutorial, including lifecycle ownership, hot reload, Player component registration, large imports, and an Editor-only Flask tool window.
+
 ## Package layout
 
 ```text
@@ -49,6 +51,8 @@ Only `package/` enters the `.inxpkg`. Source trees, build files, repository docu
 Every pull request and push to `main` validates the manifest and verifies deterministic package output. Set the manifest version, then push the matching `v<version>` tag. GitHub Actions publishes the `.inxpkg` and `infernux-plugin-release.json` to a GitHub Release, ready for the Infernux Plugins window.
 
 For a complete production example, see the [Windows](https://github.com/ChenlizheMe/infernux_windows), [Linux](https://github.com/ChenlizheMe/infernux_linux), [Web](https://github.com/ChenlizheMe/infernux_web), [Android](https://github.com/ChenlizheMe/infernux_android), and [MCP](https://github.com/ChenlizheMe/infernux_mcp) plugins.
+
+`plugin_pages/` is the only conventional source for Plugins-panel documentation. Runtime and Editor preloads are deliberately separate: runtime components and preloads are cooked into Players, while Editor panels and tools are excluded. Register threads, servers, watches, and callbacks with `PreloadContext.add_cleanup()` as soon as they are created. Infernux removes lifecycle-owned contributions during hot reload, disable, uninstall, and project shutdown.
 
 ## License
 

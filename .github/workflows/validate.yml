@@ -22,6 +22,13 @@ jobs:
           python-version: "3.13"
       - name: Validate package layout and Python sources
         run: python .infernux-dev/validate.py
+      - name: Build and verify deterministic package bytes
+        run: |
+          mkdir -p dist/repro
+          python package.py build dist/plugin.inxpkg
+          python package.py verify dist/plugin.inxpkg
+          python package.py build dist/repro/plugin.inxpkg
+          cmp dist/plugin.inxpkg dist/repro/plugin.inxpkg
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

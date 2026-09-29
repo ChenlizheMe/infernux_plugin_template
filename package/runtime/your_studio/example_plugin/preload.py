@@ -1,14 +1,13 @@
-"""Early import lifecycle for runtime and editor services."""
-
-from importlib import import_module
+"""Early lifecycle for services that must exist in Editor and Player."""
 
 from Infernux.lifecycle import InxPreload, PreloadContext
 
 
 class ExamplePluginPreload(InxPreload):
     def preload(self, context: PreloadContext) -> None:
-        if not context.runtime:
-            import_module("your_studio.example_plugin_editor.panel")
+        # Import heavy runtime dependencies here once, before scene scripts run.
+        # Reversible resources should be registered with context.add_cleanup().
+        pass
 
     def unload(self) -> None:
         pass
