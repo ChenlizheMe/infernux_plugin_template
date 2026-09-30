@@ -14,6 +14,7 @@ package/
 │     ├─ component.py
 │     └─ preload.py
 ├─ editor/
+│  ├─ translations.json
 │  └─ your_studio/example_plugin_editor/
 │     ├─ panel.py
 │     └─ preload.py
@@ -95,9 +96,11 @@ class ToolWindowPreload(inx.InxPreload):
 
 Add exact Flask and Werkzeug versions to `requirements.txt` when using this pattern. Keep the browser UI and server in `editor/` unless the Player intentionally exposes that service.
 
-## Editor panel
+## Editor panel and translations
 
-The example Editor preload imports `panel.py` inside its lifecycle transaction. Open the result through **Extensions → Example Plugin → Example Plugin**. Stable, package-prefixed panel, command, and shortcut IDs prevent ownership collisions.
+The example Editor preload imports `panel.py` inside its lifecycle transaction. Its five-level location is **Extensions → Example Plugin → Tools → Diagnostics → Live → Example Plugin**. `menu_path` supplies the literal label for each level. The parallel `menu_path_keys` tuple supplies an optional translation key for each level; use an empty string when one level must remain literal. One through five levels, and deeper paths, use the same contract.
+
+Put the package catalog at the fixed path `editor/translations.json`. Infernux validates and publishes it before importing the package's Editor preload, then removes it with the package lifecycle. The file must use the `infernux.editor_translations` schema, contain every Editor locale, and declare the same namespaced key set in every locale. Plugin keys cannot replace engine keys or keys owned by another plugin. The first menu level uses the engine's `menu.extensions` key; every plugin-owned level uses the package namespace. The catalog remains Editor-only and never enters a Player.
 
 ## Build from File Manager
 

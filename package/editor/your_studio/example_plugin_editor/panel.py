@@ -8,7 +8,15 @@ from Infernux.engine.ui.panel_registry import editor_panel
 @editor_panel(
     "Example Plugin",
     type_id="your_studio.example_plugin",
-    menu_path="Extensions/Example Plugin",
+    title_key="your_studio.example_plugin.panel_title",
+    menu_path="Extensions/Example Plugin/Tools/Diagnostics/Live",
+    menu_path_keys=(
+        "menu.extensions",
+        "your_studio.example_plugin.menu_root",
+        "your_studio.example_plugin.menu_tools",
+        "your_studio.example_plugin.menu_diagnostics",
+        "your_studio.example_plugin.menu_live",
+    ),
     interaction=PanelInteractionDescriptor(),
 )
 class ExamplePluginPanel(EditorPanel):

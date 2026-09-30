@@ -37,7 +37,7 @@ your-plugin/
 ├─ package/
 │  ├─ inx_package.json         标识、版本与引擎兼容范围
 │  ├─ runtime/                 编辑器和导出的 Player 都可使用
-│  ├─ editor/                  仅供编辑器使用的代码与工具
+│  ├─ editor/                  仅供编辑器使用的代码、工具和 translations.json
 │  ├─ plugin_pages/            插件窗口中显示的介绍页面
 │  ├─ requirements.txt         可选的 Python 依赖
 │  └─ shaders/、web/、samples/ 可选的插件资产
@@ -53,6 +53,8 @@ your-plugin/
 完整的生产项目可以参考 [Windows](https://github.com/ChenlizheMe/infernux_windows)、[Linux](https://github.com/ChenlizheMe/infernux_linux)、[Web](https://github.com/ChenlizheMe/infernux_web)、[Android](https://github.com/ChenlizheMe/infernux_android) 和 [MCP](https://github.com/ChenlizheMe/infernux_mcp) 官方插件。
 
 插件面板文档只从 `plugin_pages/` 发现。Runtime 与 Editor preload 被明确分开：运行时组件与 preload 会 Cook 进 Player，Editor 面板和工具不会。线程、服务、文件监听与回调一经创建就应交给 `PreloadContext.add_cleanup()`；引擎会在热重载、禁用、卸载与项目关闭时移除生命周期拥有的贡献。
+
+模板包含 `editor/translations.json`。Infernux 会在 Editor preload 前加载这份归属于插件包的词条表，把它用于面板标题及每一级菜单，并在禁用、卸载或热重载时自动移除。
 
 ## 许可证
 

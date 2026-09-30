@@ -37,7 +37,7 @@ your-plugin/
 ├─ package/
 │  ├─ inx_package.json         identity, version, engine compatibility
 │  ├─ runtime/                 available to Editor and exported Players
-│  ├─ editor/                  Editor-only code and tools
+│  ├─ editor/                  Editor-only code, tools, and translations.json
 │  ├─ plugin_pages/            documentation shown in the Plugins window
 │  ├─ requirements.txt         optional Python requirements
 │  └─ shaders/, web/, samples/ optional plugin assets
@@ -53,6 +53,8 @@ Every pull request and push to `main` validates the manifest and verifies determ
 For a complete production example, see the [Windows](https://github.com/ChenlizheMe/infernux_windows), [Linux](https://github.com/ChenlizheMe/infernux_linux), [Web](https://github.com/ChenlizheMe/infernux_web), [Android](https://github.com/ChenlizheMe/infernux_android), and [MCP](https://github.com/ChenlizheMe/infernux_mcp) plugins.
 
 `plugin_pages/` is the only conventional source for Plugins-panel documentation. Runtime and Editor preloads are deliberately separate: runtime components and preloads are cooked into Players, while Editor panels and tools are excluded. Register threads, servers, watches, and callbacks with `PreloadContext.add_cleanup()` as soon as they are created. Infernux removes lifecycle-owned contributions during hot reload, disable, uninstall, and project shutdown.
+
+The template includes `editor/translations.json`. Infernux loads this package-owned catalog before Editor preloads, applies it to panel titles and every declared menu level, and removes it on disable, uninstall, or hot reload.
 
 ## License
 

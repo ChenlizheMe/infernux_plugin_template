@@ -14,6 +14,7 @@ package/
 │     ├─ component.py
 │     └─ preload.py
 ├─ editor/
+│  ├─ translations.json
 │  └─ your_studio/example_plugin_editor/
 │     ├─ panel.py
 │     └─ preload.py
@@ -95,9 +96,11 @@ class ToolWindowPreload(inx.InxPreload):
 
 采用此方案时，把 Flask 与 Werkzeug 的精确版本写入 `requirements.txt`。除非 Player 本身确实要提供该服务，否则浏览器界面和服务端都应留在 `editor/`。
 
-## Editor 面板
+## Editor 面板与词条表
 
-示例 Editor preload 会在自己的生命周期事务中导入 `panel.py`。通过**扩展 → Example Plugin → Example Plugin**打开面板。面板、命令和快捷键应使用稳定且带包前缀的 ID，避免所有权冲突。
+示例 Editor preload 会在自己的生命周期事务中导入 `panel.py`。它的五级位置是**扩展 → 示例插件 → 工具 → 诊断 → 实时 → 示例插件**。`menu_path` 为每一级提供默认文本，与之平行的 `menu_path_keys` 元组为每一级提供可选词条键；某一级需要保持原文时填写空字符串。一至五级以及更深路径都使用同一套协议。
+
+插件词条表固定放在 `editor/translations.json`。Infernux 会在导入插件的 Editor preload 前完成校验和发布，并随插件生命周期自动移除。文件必须使用 `infernux.editor_translations` schema，包含 Editor 支持的全部语言，而且每种语言必须声明完全相同、带插件命名空间的键集合。插件不得覆盖引擎词条或其它插件拥有的键。第一级直接使用引擎的 `menu.extensions`，其余各级使用插件自己的命名空间。该文件属于 Editor，绝不会进入 Player。
 
 ## 从 File Manager 打包
 

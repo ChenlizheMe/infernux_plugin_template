@@ -1,0 +1,19 @@
+{
+  "$schema": "infernux.editor_translations",
+  "locales": {
+    "en": {
+      "your_studio.example_plugin.menu_diagnostics": "Diagnostics",
+      "your_studio.example_plugin.menu_live": "Live",
+      "your_studio.example_plugin.menu_root": "Example Plugin",
+      "your_studio.example_plugin.menu_tools": "Tools",
+      "your_studio.example_plugin.panel_title": "Example Plugin"
+    },
+    "zh": {
+      "your_studio.example_plugin.menu_diagnostics": "诊断",
+      "your_studio.example_plugin.menu_live": "实时",
+      "your_studio.example_plugin.menu_root": "示例插件",
+      "your_studio.example_plugin.menu_tools": "工具",
+      "your_studio.example_plugin.panel_title": "示例插件"
+    }
+  }
+}
