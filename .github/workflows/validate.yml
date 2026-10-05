@@ -22,6 +22,8 @@ jobs:
           python-version: "3.13"
       - name: Validate package layout and Python sources
         run: python .infernux-dev/validate.py
+      - name: Check validation contracts
+        run: python -m unittest discover -s tests
       - name: Build and verify deterministic package bytes
         run: |
           mkdir -p dist/repro
