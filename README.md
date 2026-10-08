@@ -26,6 +26,8 @@ flowchart LR
 
 `package.py` uses only the Python standard library, so packaging does not require an Infernux installation. Your repository may use CMake, Gradle, Cargo, npm, or another build system; copy only the files users need at runtime into `package/`.
 
+The included Python starter requires Infernux 0.4.1 and uses the lowercase `infernux` package. Keep the manifest's engine range aligned with the APIs your plugin actually uses.
+
 Inside an Infernux project, the selected folder is already the package root: select it in Project/File Manager, right click, and choose **Export InxPackage...**. The installed Plugins page contains the full tutorial, including lifecycle ownership, hot reload, Player component registration, large imports, and an Editor-only Flask tool window.
 
 ## Package layout

@@ -26,6 +26,8 @@ flowchart LR
 
 `package.py` 只使用 Python 标准库，打包时不需要安装 Infernux。仓库可以自由使用 CMake、Gradle、Cargo、npm 或其他构建工具；只需把用户运行插件时真正需要的文件放进 `package/`。
 
+模板中的 Python 示例需要 Infernux 0.4.1，并使用小写的 `infernux` 包。插件清单中的引擎版本范围应与实际使用的 API 保持一致。
+
 在 Infernux 项目中，被选中的文件夹本身就是包根：在 Project/File Manager 中选中它，右键选择**导出 InxPackage...**。安装后插件页面中的完整教程会说明生命周期所有权、热重载、Player 组件注册、大型包导入以及仅 Editor 使用的 Flask 独立工具窗口。
 
 ## 目录结构
