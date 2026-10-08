@@ -80,6 +80,70 @@ class PackageValidationTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Unsupported manifest fields: dependencies", result.stderr)
 
+    def test_runtime_editor_imports_are_rejected_in_both_package_spellings(self):
+        for source in (
+            "import infernux.engine.ui\n",
+            "from infernux.engine.ui import Panel\n",
+            "from infernux.engine import ui\n",
+            "import Infernux.engine.ui\n",
+        ):
+            with self.subTest(source=source):
+                self.write("runtime/hello.py", source)
+                result = self.validate()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("Runtime source imports Editor code", result.stderr)
+
+    def test_runtime_cannot_import_the_plugins_actual_editor_package(self):
+        self.write("editor/studio/tools/__init__.py", "")
+        for source in (
+            "import studio.tools\n",
+            "from studio import tools\n",
+            "from studio.tools import Panel\n",
+        ):
+            with self.subTest(source=source):
+                self.write("runtime/hello.py", source)
+                result = self.validate()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("Runtime source imports Editor code", result.stderr)
+
+    def test_editor_names_in_comments_and_strings_are_valid(self):
+        self.write(
+            "runtime/hello.py",
+            '# Infernux.engine.ui belongs in Editor code.\n'
+            'description = "example_plugin_editor documentation"\n',
+        )
+        result = self.validate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_runtime_subpackages_and_external_libraries_are_valid(self):
+        self.write("editor/studio/tools/__init__.py", "")
+        self.write("runtime/studio/game/__init__.py", "")
+        self.write(
+            "runtime/hello.py",
+            "import infernux.renderstack\nimport numpy\n"
+            "from packaging.version import Version\nfrom studio import game\n",
+        )
+        result = self.validate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_external_modules_in_a_shared_namespace_are_valid(self):
+        self.write("editor/studio/tools/__init__.py", "")
+        self.write("runtime/hello.py", "from studio import external_library\n")
+        result = self.validate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_relative_editor_import_is_rejected(self):
+        self.write("editor/studio/editor_tools.py", "")
+        self.write("runtime/studio/hello.py", "from . import editor_tools\n")
+        result = self.validate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Runtime source imports Editor code", result.stderr)
+
+    def test_editor_source_can_import_editor_apis(self):
+        self.write("editor/studio/tools.py", "from infernux.engine.ui import Panel\n")
+        result = self.validate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()
