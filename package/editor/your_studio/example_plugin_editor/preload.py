@@ -2,7 +2,7 @@
 
 from importlib import import_module
 
-from Infernux.lifecycle import InxPreload, PreloadContext
+from infernux.lifecycle import InxPreload, PreloadContext
 
 
 class ExamplePluginEditorPreload(InxPreload):

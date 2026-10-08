@@ -3,6 +3,6 @@
   "reference": "your-studio/example-plugin",
   "name": "Example Plugin",
   "version": "0.1.0",
-  "engine": ">=0.4,<0.5",
+  "engine": ">=0.4.1,<0.5",
   "intro": "A minimal Infernux runtime and editor extension."
 }

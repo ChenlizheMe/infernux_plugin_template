@@ -1,7 +1,7 @@
 """Example gameplay component shipped to the player build."""
 
-from Infernux.components import InxComponent, serialized_field
-from Infernux.lib import Vector3, quatf
+from infernux.components import InxComponent, serialized_field
+from infernux.lib import Vector3, quatf
 
 
 class ExampleRotator(InxComponent):

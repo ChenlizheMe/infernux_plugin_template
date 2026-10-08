@@ -1,6 +1,6 @@
 """Early lifecycle for services that must exist in Editor and Player."""
 
-from Infernux.lifecycle import InxPreload, PreloadContext
+from infernux.lifecycle import InxPreload, PreloadContext
 
 
 class ExamplePluginPreload(InxPreload):

@@ -1,8 +1,8 @@
 """Example panel available only inside the editor."""
 
-from Infernux.engine.interaction import PanelInteractionDescriptor
-from Infernux.engine.ui.editor_panel import EditorPanel
-from Infernux.engine.ui.panel_registry import editor_panel
+from infernux.engine.interaction import PanelInteractionDescriptor
+from infernux.engine.ui.editor_panel import EditorPanel
+from infernux.engine.ui.panel_registry import editor_panel
 
 
 @editor_panel(

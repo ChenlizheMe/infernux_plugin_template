@@ -22,6 +22,8 @@ jobs:
           python-version: "3.13"
       - name: Validate package layout and Python sources
         run: python .infernux-dev/validate.py
+      - name: Check validation contracts
+        run: python -m unittest discover -s tests
       - name: Build and verify deterministic package bytes
         run: |
           mkdir -p dist/repro
@@ -62,9 +64,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" "dist/${PACKAGE_NAME}" dist/infernux-plugin-release.json --clobber
-          else
-            gh release create "${GITHUB_REF_NAME}" "dist/${PACKAGE_NAME}" dist/infernux-plugin-release.json \
-              --verify-tag --generate-notes
-          fi
+          # Published reference/version pairs are immutable. A duplicate tag
+          # must fail instead of replacing users' installed archive baseline.
+          gh release create "${GITHUB_REF_NAME}" "dist/${PACKAGE_NAME}" dist/infernux-plugin-release.json \
+            --verify-tag --generate-notes
