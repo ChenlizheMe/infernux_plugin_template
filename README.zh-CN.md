@@ -52,7 +52,7 @@ your-plugin/
 
 每个 Pull Request 和推送到 `main` 的提交都会校验 manifest，并确认两次构建得到完全一致的包。准备发布时，先更新 manifest 中的版本，再推送对应的 `v<version>` 标签。GitHub Actions 会把 `.inxpkg` 和 `infernux-plugin-release.json` 自动上传到 GitHub Release，供 Infernux 插件窗口识别和安装。
 
-完整的生产项目可以参考 [Windows](https://github.com/ChenlizheMe/infernux_windows)、[Linux](https://github.com/ChenlizheMe/infernux_linux)、[Web](https://github.com/ChenlizheMe/infernux_web)、[Android](https://github.com/ChenlizheMe/infernux_android) 和 [MCP](https://github.com/ChenlizheMe/infernux_mcp) 官方插件。
+完整的生产项目可以参考 [Windows](https://github.com/InfernuxEngine/infernux_windows)、[Linux](https://github.com/InfernuxEngine/infernux_linux)、[Web](https://github.com/InfernuxEngine/infernux_web)、[Android](https://github.com/InfernuxEngine/infernux_android) 和 [MCP](https://github.com/InfernuxEngine/infernux_mcp) 官方插件。
 
 插件面板文档只从 `plugin_pages/` 发现。Runtime 与 Editor preload 被明确分开：运行时组件与 preload 会 Cook 进 Player，Editor 面板和工具不会。线程、服务、文件监听与回调一经创建就应交给 `PreloadContext.add_cleanup()`；引擎会在热重载、禁用、卸载与项目关闭时移除生命周期拥有的贡献。
 
